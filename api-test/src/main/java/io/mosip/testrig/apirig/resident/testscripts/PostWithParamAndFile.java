@@ -1,14 +1,13 @@
-package io.mosip.testrig.apirig.testscripts;
+
+package io.mosip.testrig.apirig.resident.testscripts;
 
 import java.lang.reflect.Field;
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.json.JSONObject;
 import org.testng.ITest;
 import org.testng.ITestContext;
 import org.testng.ITestResult;
@@ -23,6 +22,8 @@ import org.testng.internal.TestResult;
 
 import io.mosip.testrig.apirig.dto.OutputValidationDto;
 import io.mosip.testrig.apirig.dto.TestCaseDTO;
+import io.mosip.testrig.apirig.resident.utils.ResidentConfigManager;
+import io.mosip.testrig.apirig.resident.utils.ResidentUtil;
 import io.mosip.testrig.apirig.testrunner.BaseTestCase;
 import io.mosip.testrig.apirig.testrunner.HealthChecker;
 import io.mosip.testrig.apirig.utils.AdminTestException;
@@ -31,13 +32,12 @@ import io.mosip.testrig.apirig.utils.AuthenticationTestException;
 import io.mosip.testrig.apirig.utils.GlobalConstants;
 import io.mosip.testrig.apirig.utils.OutputValidationUtil;
 import io.mosip.testrig.apirig.utils.ReportUtil;
-import io.mosip.testrig.apirig.utils.ResidentConfigManager;
-import io.mosip.testrig.apirig.utils.ResidentUtil;
 import io.restassured.response.Response;
 
-public class PostWithOnlyPathParam extends AdminTestUtil implements ITest {
-	private static final Logger logger = Logger.getLogger(PostWithOnlyPathParam.class);
+public class PostWithParamAndFile extends AdminTestUtil implements ITest {
+	private static final Logger logger = Logger.getLogger(PostWithParamAndFile.class);
 	protected String testCaseName = "";
+	public String idKeyName = null;
 	public Response response = null;
 	public boolean sendEsignetToken = false;
 
@@ -66,6 +66,7 @@ public class PostWithOnlyPathParam extends AdminTestUtil implements ITest {
 	public Object[] getTestCaseList(ITestContext context) {
 		String ymlFile = context.getCurrentXmlTest().getLocalParameters().get("ymlFile");
 		sendEsignetToken = context.getCurrentXmlTest().getLocalParameters().containsKey("sendEsignetToken");
+		idKeyName = context.getCurrentXmlTest().getLocalParameters().get("idKeyName");
 		logger.info("Started executing yml: " + ymlFile);
 		return getYmlTestData(ymlFile);
 	}
@@ -84,12 +85,10 @@ public class PostWithOnlyPathParam extends AdminTestUtil implements ITest {
 		testCaseName = testCaseDTO.getTestCaseName();
 		testCaseName = ResidentUtil.isTestCaseValidForExecution(testCaseDTO);
 		testCaseName = isTestCaseValidForExecution(testCaseDTO);
-		String[] templateFields = testCaseDTO.getTemplateFields();
 		if (HealthChecker.signalTerminateExecution) {
 			throw new SkipException(
 					GlobalConstants.TARGET_ENV_HEALTH_CHECK_FAILED + HealthChecker.healthCheckFailureMapS);
 		}
-
 		if (testCaseDTO.getTestCaseName().contains("VID") || testCaseDTO.getTestCaseName().contains("Vid")) {
 			if (!BaseTestCase.getSupportedIdTypesValueFromActuator().contains("VID")
 					&& !BaseTestCase.getSupportedIdTypesValueFromActuator().contains("vid")) {
@@ -97,49 +96,30 @@ public class PostWithOnlyPathParam extends AdminTestUtil implements ITest {
 			}
 		}
 
-		if (testCaseDTO.getTemplateFields() != null && templateFields.length > 0) {
-			ArrayList<JSONObject> inputtestCases = AdminTestUtil.getInputTestCase(testCaseDTO);
-			ArrayList<JSONObject> outputtestcase = AdminTestUtil.getOutputTestCase(testCaseDTO);
-			for (int i = 0; i < languageList.size(); i++) {
-				response = postWithOnlyPathParamAndCookie(ApplnURI + testCaseDTO.getEndPoint(),
-						getJsonFromTemplate(inputtestCases.get(i).toString(), testCaseDTO.getInputTemplate()),
-						COOKIENAME, testCaseDTO.getRole(), testCaseDTO.getTestCaseName());
+		String inputJson = getJsonFromTemplate(testCaseDTO.getInput(), testCaseDTO.getInputTemplate());
 
-				Map<String, List<OutputValidationDto>> ouputValid = OutputValidationUtil.doJsonOutputValidation(
-						response.asString(),
-						getJsonFromTemplate(outputtestcase.get(i).toString(), testCaseDTO.getOutputTemplate()),
-						testCaseDTO, response.getStatusCode());
-				Reporter.log(ReportUtil.getOutputValidationReport(ouputValid));
+		response = postWithParamAndFile(ApplnURI + testCaseDTO.getEndPoint(), inputJson, testCaseDTO.getRole(),
+				testCaseDTO.getTestCaseName(), idKeyName, sendEsignetToken);
 
-				if (!OutputValidationUtil.publishOutputResult(ouputValid))
-					throw new AdminTestException("Failed at output validation");
-			}
+		Map<String, List<OutputValidationDto>> ouputValid = null;
+		if (testCaseName.contains("_StatusCode")) {
+
+			OutputValidationDto customResponse = customStatusCodeResponse(String.valueOf(response.getStatusCode()),
+					testCaseDTO.getOutput());
+
+			ouputValid = new HashMap<>();
+			ouputValid.put(GlobalConstants.EXPECTED_VS_ACTUAL, List.of(customResponse));
+		} else {
+			ouputValid = OutputValidationUtil.doJsonOutputValidation(response.asString(),
+					getJsonFromTemplate(testCaseDTO.getOutput(), testCaseDTO.getOutputTemplate()), testCaseDTO,
+					response.getStatusCode());
 		}
 
-		else {
-			response = postWithOnlyPathParamAndCookie(ApplnURI + testCaseDTO.getEndPoint(),
-					getJsonFromTemplate(testCaseDTO.getInput(), testCaseDTO.getInputTemplate()), COOKIENAME,
-					testCaseDTO.getRole(), testCaseDTO.getTestCaseName(), sendEsignetToken);
+		Reporter.log(ReportUtil.getOutputValidationReport(ouputValid));
 
-			Map<String, List<OutputValidationDto>> ouputValid = null;
-			if (testCaseName.contains("_StatusCode")) {
+		if (!OutputValidationUtil.publishOutputResult(ouputValid))
+			throw new AdminTestException("Failed at output validation");
 
-				OutputValidationDto customResponse = customStatusCodeResponse(String.valueOf(response.getStatusCode()),
-						testCaseDTO.getOutput());
-
-				ouputValid = new HashMap<>();
-				ouputValid.put(GlobalConstants.EXPECTED_VS_ACTUAL, List.of(customResponse));
-			} else {
-				ouputValid = OutputValidationUtil.doJsonOutputValidation(response.asString(),
-						getJsonFromTemplate(testCaseDTO.getOutput(), testCaseDTO.getOutputTemplate()), testCaseDTO,
-						response.getStatusCode());
-			}
-
-			Reporter.log(ReportUtil.getOutputValidationReport(ouputValid));
-
-			if (!OutputValidationUtil.publishOutputResult(ouputValid))
-				throw new AdminTestException("Failed at output validation");
-		}
 	}
 
 	/**
