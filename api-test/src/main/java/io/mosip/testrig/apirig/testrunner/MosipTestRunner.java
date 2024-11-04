@@ -92,8 +92,8 @@ public class MosipTestRunner {
 			KeycloakUserManager.createUsers();
 			KeycloakUserManager.closeKeycloakInstance();
 
-			List<String> localLanguageList = new ArrayList<>(BaseTestCase.getLanguageList());
-			AdminTestUtil.getLocationData();
+			AdminTestUtil.getRegistrationCenterData();
+			AdminTestUtil.getLocationDataWithLocationCode(BaseTestCase.locationCode);
 
 			// Generate device certificates to be consumed by Mock-MDS
 			PartnerRegistration.deleteCertificates();
