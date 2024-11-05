@@ -1,10 +1,9 @@
-package io.mosip.testrig.apirig.testscripts;
+package io.mosip.testrig.apirig.resident.testscripts;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -21,26 +20,27 @@ import org.testng.annotations.Test;
 import org.testng.internal.BaseTestMethod;
 import org.testng.internal.TestResult;
 
-import io.mosip.testrig.apirig.dto.OutputValidationDto;
+import com.itextpdf.text.pdf.PdfReader;
+import com.itextpdf.text.pdf.parser.PdfTextExtractor;
+
 import io.mosip.testrig.apirig.dto.TestCaseDTO;
+import io.mosip.testrig.apirig.resident.utils.ResidentConfigManager;
+import io.mosip.testrig.apirig.resident.utils.ResidentUtil;
 import io.mosip.testrig.apirig.testrunner.BaseTestCase;
 import io.mosip.testrig.apirig.testrunner.HealthChecker;
-import io.mosip.testrig.apirig.utils.AdminTestException;
 import io.mosip.testrig.apirig.utils.AdminTestUtil;
-import io.mosip.testrig.apirig.utils.AuthenticationTestException;
 import io.mosip.testrig.apirig.utils.GlobalConstants;
-import io.mosip.testrig.apirig.utils.OutputValidationUtil;
-import io.mosip.testrig.apirig.utils.ReportUtil;
-import io.mosip.testrig.apirig.utils.ResidentConfigManager;
-import io.mosip.testrig.apirig.utils.ResidentUtil;
+import io.mosip.testrig.apirig.utils.GlobalMethods;
 import io.restassured.response.Response;
 
-public class SimplePatch extends AdminTestUtil implements ITest {
-	private static final Logger logger = Logger.getLogger(SimplePatch.class);
+public class GetWithQueryParamForDownloadCard extends AdminTestUtil implements ITest {
+	private static final Logger logger = Logger.getLogger(GetWithQueryParamForDownloadCard.class);
 	protected String testCaseName = "";
 	public Response response = null;
+	public byte[] pdf=null;
+	public String pdfAsText =null;
 	public boolean sendEsignetToken = false;
-
+	
 	@BeforeClass
 	public static void setLogLevel() {
 		if (ResidentConfigManager.IsDebugEnabled())
@@ -48,7 +48,7 @@ public class SimplePatch extends AdminTestUtil implements ITest {
 		else
 			logger.setLevel(Level.ERROR);
 	}
-
+	
 	/**
 	 * get current testcaseName
 	 */
@@ -66,9 +66,11 @@ public class SimplePatch extends AdminTestUtil implements ITest {
 	public Object[] getTestCaseList(ITestContext context) {
 		String ymlFile = context.getCurrentXmlTest().getLocalParameters().get("ymlFile");
 		sendEsignetToken = context.getCurrentXmlTest().getLocalParameters().containsKey("sendEsignetToken");
-		logger.info("Started executing yml: " + ymlFile);
+		logger.info("Started executing yml: "+ymlFile);
 		return getYmlTestData(ymlFile);
 	}
+	
+	
 
 	/**
 	 * Test method for OTP Generation execution
@@ -76,70 +78,81 @@ public class SimplePatch extends AdminTestUtil implements ITest {
 	 * @param objTestParameters
 	 * @param testScenario
 	 * @param testcaseName
-	 * @throws AuthenticationTestException
-	 * @throws AdminTestException
+	 * @throws Exception 
 	 */
 	@Test(dataProvider = "testcaselist")
-	public void test(TestCaseDTO testCaseDTO) throws AuthenticationTestException, AdminTestException {
+	public void test(TestCaseDTO testCaseDTO) throws Exception {
 		testCaseName = testCaseDTO.getTestCaseName();
 		testCaseName = ResidentUtil.isTestCaseValidForExecution(testCaseDTO);
 		testCaseName = isTestCaseValidForExecution(testCaseDTO);
-		String[] templateFields = testCaseDTO.getTemplateFields();
 		if (HealthChecker.signalTerminateExecution) {
-			throw new SkipException(
-					GlobalConstants.TARGET_ENV_HEALTH_CHECK_FAILED + HealthChecker.healthCheckFailureMapS);
+			throw new SkipException(GlobalConstants.TARGET_ENV_HEALTH_CHECK_FAILED + HealthChecker.healthCheckFailureMapS);
 		}
-
+		
 		if (testCaseDTO.getTestCaseName().contains("VID") || testCaseDTO.getTestCaseName().contains("Vid")) {
 			if (!BaseTestCase.getSupportedIdTypesValueFromActuator().contains("VID")
 					&& !BaseTestCase.getSupportedIdTypesValueFromActuator().contains("vid")) {
 				throw new SkipException(GlobalConstants.VID_FEATURE_NOT_SUPPORTED);
 			}
 		}
+		
+		String[] templateFields = testCaseDTO.getTemplateFields();
 
 		if (testCaseDTO.getTemplateFields() != null && templateFields.length > 0) {
 			ArrayList<JSONObject> inputtestCases = AdminTestUtil.getInputTestCase(testCaseDTO);
-			ArrayList<JSONObject> outputtestcase = AdminTestUtil.getOutputTestCase(testCaseDTO);
 			for (int i = 0; i < languageList.size(); i++) {
-				response = patchWithBodyAndCookie(ApplnURI + testCaseDTO.getEndPoint(),
+				pdf = getWithQueryParamAndCookieForPdf(ApplnURI + testCaseDTO.getEndPoint(),
 						getJsonFromTemplate(inputtestCases.get(i).toString(), testCaseDTO.getInputTemplate()),
 						COOKIENAME, testCaseDTO.getRole(), testCaseDTO.getTestCaseName());
+				PdfReader pdfReader = null;
+				ByteArrayInputStream bIS = null;
 
-				Map<String, List<OutputValidationDto>> ouputValid = OutputValidationUtil.doJsonOutputValidation(
-						response.asString(),
-						getJsonFromTemplate(outputtestcase.get(i).toString(), testCaseDTO.getOutputTemplate()),
-						testCaseDTO, response.getStatusCode());
-				Reporter.log(ReportUtil.getOutputValidationReport(ouputValid));
+				try {
+					bIS = new ByteArrayInputStream(pdf);
+					pdfReader = new PdfReader(bIS);
+					pdfAsText = PdfTextExtractor.getTextFromPage(pdfReader, 1);
+				} catch (IOException e) {
+					Reporter.log("Exception : " + e.getMessage());
+				} finally {
+					AdminTestUtil.closeByteArrayInputStream(bIS);
+					AdminTestUtil.closePdfReader(pdfReader);
+				}
 
-				if (!OutputValidationUtil.publishOutputResult(ouputValid))
-					throw new AdminTestException("Failed at output validation");
+				if (pdf != null && (new String(pdf).contains("errors") || pdfAsText == null)) {
+					GlobalMethods.reportResponse(null, ApplnURI + testCaseDTO.getEndPoint(), "Not able to download");
+				} else {
+					GlobalMethods.reportResponse(null, ApplnURI + testCaseDTO.getEndPoint(), pdfAsText);
+				}
 			}
-		}
-
+		}  
+		
 		else {
-			response = patchWithBodyAndCookie(ApplnURI + testCaseDTO.getEndPoint(),
-					getJsonFromTemplate(testCaseDTO.getInput(), testCaseDTO.getInputTemplate()), COOKIENAME,
-					testCaseDTO.getRole(), testCaseDTO.getTestCaseName(), sendEsignetToken);
-
-			Map<String, List<OutputValidationDto>> ouputValid = null;
-			if (testCaseName.contains("_StatusCode")) {
-
-				OutputValidationDto customResponse = customStatusCodeResponse(String.valueOf(response.getStatusCode()),
-						testCaseDTO.getOutput());
-
-				ouputValid = new HashMap<>();
-				ouputValid.put(GlobalConstants.EXPECTED_VS_ACTUAL, List.of(customResponse));
-			} else {
-				ouputValid = OutputValidationUtil.doJsonOutputValidation(response.asString(),
-						getJsonFromTemplate(testCaseDTO.getOutput(), testCaseDTO.getOutputTemplate()), testCaseDTO,
-						response.getStatusCode());
+			pdf = getWithQueryParamAndCookieForPdf(ApplnURI + testCaseDTO.getEndPoint(), getJsonFromTemplate(testCaseDTO.getInput(), testCaseDTO.getInputTemplate()), COOKIENAME, testCaseDTO.getRole(), testCaseDTO.getTestCaseName(), sendEsignetToken);
+			
+			PdfReader pdfReader = null;
+			ByteArrayInputStream bIS = null;
+			
+			try {
+				bIS = new ByteArrayInputStream(pdf);
+				pdfReader = new PdfReader(bIS);
+				pdfAsText = PdfTextExtractor.getTextFromPage(pdfReader, 1);
+			} catch (IOException e) {
+				Reporter.log("Exception : " + e.getMessage());
+			} finally {
+				AdminTestUtil.closeByteArrayInputStream(bIS);
+				AdminTestUtil.closePdfReader(pdfReader);
 			}
-			Reporter.log(ReportUtil.getOutputValidationReport(ouputValid));
-
-			if (!OutputValidationUtil.publishOutputResult(ouputValid))
-				throw new AdminTestException("Failed at output validation");
+			 
+			 if(pdf!=null && (new String(pdf).contains("errors")|| pdfAsText == null)) {
+				 GlobalMethods.reportResponse(null, ApplnURI + testCaseDTO.getEndPoint(), "Not able to download");
+			 }
+			 else {
+				 GlobalMethods.reportResponse(null, ApplnURI + testCaseDTO.getEndPoint(), pdfAsText);
+			 }
 		}
-
+		 
+				
+		
 	}
 
 	/**
@@ -158,7 +171,7 @@ public class SimplePatch extends AdminTestUtil implements ITest {
 			f.setAccessible(true);
 			f.set(baseTestMethod, testCaseName);
 		} catch (Exception e) {
-			Reporter.log("Exception : " + e.getMessage());
+			Reporter.log(GlobalConstants.EXCEPTION + e.getMessage());
 		}
-	}
+	}	
 }
