@@ -19,10 +19,7 @@ import org.springframework.core.env.Environment;
 import org.springframework.test.util.ReflectionTestUtils;
 
 import java.io.IOException;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 
 import static io.mosip.resident.service.impl.IdentityServiceTest.getAuthUserDetailsFromAuthentication;
 import static org.junit.Assert.assertEquals;
@@ -70,7 +67,7 @@ public class IdentityUtilTest {
     private String uin;
 
     @Before
-    public void setup() throws ApisResourceAccessException, ResidentServiceCheckedException {
+    public void setup() throws ApisResourceAccessException, ResidentServiceCheckedException, IOException {
         Map identityMap = new LinkedHashMap();
         uin = "8251649601";
         identityMap.put("UIN", uin);
@@ -88,6 +85,11 @@ public class IdentityUtilTest {
         when(cachedIdentityDataUtil.getCachedIdentityData(Mockito.any(), Mockito.any(), Mockito.any())).thenReturn(idResponseDTO1);
         when(residentConfigService.getUiSchemaFilteredInputAttributes(anyString()))
                 .thenReturn(List.of("UIN", "email", "phone", "dateOfBirth", "firstName", "middleName", "lastName", "perpetualVID"));
+        Map<String, Object> identityMappingMap = new HashMap<>();
+        Map<String, String> valueMap = new HashMap<>();
+        valueMap.put("value", "fullName");
+        identityMappingMap.put("name", valueMap);
+        when(residentConfigService.getIdentityMappingMap()).thenReturn(identityMappingMap);
         Optional<String> perpVid = Optional.of("8251649601");
         when(perpetualVidUtil.getPerpatualVid(anyString())).thenReturn(perpVid);
     }
