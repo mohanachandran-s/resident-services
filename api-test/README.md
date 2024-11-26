@@ -54,7 +54,7 @@ You can access the test automation code using either of the following methods:
 
 ### From Git Bash
 
-1. Copy the Git repository URL: `https://github.com/mosip/admin-services`
+1. Copy the Git repository URL: `https://github.com/mosip/resident-services`
 2. Open **Git Bash** on your local machine.
 3. Run the following command to clone the repository:
    ```sh
@@ -128,7 +128,7 @@ To execute the tests using Eclipse IDE, use the following steps:
    - Go to `Run` > `Run Configurations`.
    - In the **Run Configurations** window, create a new configuration for your tests:
      - Right-click on **Java Application** and select **New**.
-     - In the **Main** tab, select the project by browsing the location where the `api-test` folder is saved, and select the **Main class** as `io.mosip.testrig.apirig.esignet.testrunner.MosipTestRunner`.
+     - In the **Main** tab, select the project by browsing the location where the `api-test` folder is saved, and select the **Main class** as `io.mosip.testrig.apirig.resident.testrunner.MosipTestRunner`.
    - In the **Arguments** tab, add the necessary **VM arguments**:
      - **VM Arguments**:
        ```
