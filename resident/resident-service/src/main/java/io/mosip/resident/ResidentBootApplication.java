@@ -44,7 +44,7 @@ import org.springframework.web.client.RestTemplate;
 @Import({TokenIDGenerator.class, ValidateTokenUtil.class, CbeffImpl.class, TransliterationService.class, TransliterationServiceUtil.class
 , PDFGeneratorImpl.class, UinValidatorImpl.class, VidValidatorImpl.class, RidValidatorImpl.class, TemplateManagerBuilderImpl.class,
 		SubscriberClientImpl.class, RestTemplateHelper.class, TransliterationImpl.class, PublisherClientImpl.class, IdObjectValidatorConfig.class
-, RestTemplate.class, KeyStoreImpl.class})
+		, RestTemplate.class, KeyStoreImpl.class})
 public class ResidentBootApplication {
 
 	public static void main(String[] args) {
