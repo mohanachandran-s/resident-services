@@ -50,12 +50,12 @@ public class ProxyPartnerManagementServiceImpl implements ProxyPartnerManagement
 					ResidentErrorCode.API_RESOURCE_ACCESS_EXCEPTION.getErrorMessage(), e);
 		}
 		Map<String, Object> partnerResponse = new LinkedHashMap<>((Map<String, Object>) response.getResponse());
-        List<Map<String,?>> partners = (List<Map<String, ?>>) partnerResponse.get(ResidentConstants.PARTNERS_DATA);
+        List<Map<String,?>> partners = (List<Map<String, ?>>) partnerResponse.get(ResidentConstants.PARTNERS);
         if (partners == null) {
             return Map.of();
         }
         return partners.stream()
-        		.filter(map -> partnerId.equals(map.get(ResidentConstants.PMS_PARTNER_ID_V2)))
+        		.filter(map -> partnerId.equals(map.get(ResidentConstants.PMS_PARTNER_ID)))
         		.findAny()
         		.orElse(Map.of());
 	}

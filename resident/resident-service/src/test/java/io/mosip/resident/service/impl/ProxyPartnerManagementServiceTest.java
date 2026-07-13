@@ -68,11 +68,11 @@ public class ProxyPartnerManagementServiceTest {
 	@Before
 	public void setUp() throws Exception {
 		Map partnerMap=new HashMap<>();
-		partnerMap.put("partnerId", "2345671");
+		partnerMap.put("partnerID", "2345671");
 		responseWrapper = new ResponseWrapper<>();
 		responseWrapper.setVersion("v1");
 		responseWrapper.setId("1");
-		responseWrapper.setResponse(Map.of("data",List.of(partnerMap)));
+		responseWrapper.setResponse(Map.of("partners",List.of(partnerMap)));
 		when(partnersByPartnerTypeCache.getPartnersByPartnerType(any(), any()))
 				.thenReturn(responseWrapper);
 	}
@@ -119,7 +119,7 @@ public class ProxyPartnerManagementServiceTest {
 	@Test
 	public void testGetPartnerDetailFromPartnerId() throws ResidentServiceCheckedException {
 		Map<String, ?> result = proxyPartnerManagementService.getPartnerDetailFromPartnerIdAndPartnerType("2345671", "Auth");
-		assertEquals("2345671", result.get("partnerId"));
+		assertEquals("2345671", result.get("partnerID"));
 	}
 
 	@Test(expected = ResidentServiceException.class)
@@ -133,6 +133,8 @@ public class ProxyPartnerManagementServiceTest {
 	public void testGetPartnersByPartnerTypeV2() throws ApisResourceAccessException, ResidentServiceCheckedException {
 		Map<String, Object> partner = new HashMap<>();
 		partner.put("partnerId", "2345671");
+		partner.put("orgName", "IITB");
+		partner.put("partnerType", "Auth_Partner");
 		Map<String, Object> pageResponse = new HashMap<>();
 		pageResponse.put("totalResults", 1);
 		pageResponse.put("data", List.of(partner));
@@ -150,7 +152,11 @@ public class ProxyPartnerManagementServiceTest {
 		ResponseWrapper<?> result = partnersByPartnerType.getPartnersByPartnerType(Optional.of("42"),
 				ApiName.PARTNER_API_URL);
 		Map<String, Object> mergedResponse = (Map<String, Object>) result.getResponse();
-		assertEquals(1, ((List<?>) mergedResponse.get("data")).size());
+		List<Map<String, Object>> partners = (List<Map<String, Object>>) mergedResponse.get("partners");
+		assertEquals(1, partners.size());
+		assertEquals("2345671", partners.get(0).get("partnerID"));
+		assertEquals("IITB", partners.get(0).get("organizationName"));
+		assertEquals("Auth_Partner", partners.get(0).get("partnerType"));
 		verify(residentServiceRestClient).getApi((ApiName) any(), (List<String>) any(), (List<String>) any(),
 				(List<Object>) any(), (Class<Object>) any());
 	}

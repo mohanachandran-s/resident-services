@@ -114,14 +114,41 @@ public class PartnersByPartnerType {
                     ResidentErrorCode.API_RESOURCE_ACCESS_EXCEPTION.getErrorMessage(), e);
         }
 
+        // Transform the merged v2 records into the v1 "partners" shape the UI expects.
         Map<String, Object> mergedResponse = new LinkedHashMap<>();
-        mergedResponse.put(PAGE_NO, 0);
-        mergedResponse.put(PAGE_SIZE, mergedData.size());
-        mergedResponse.put(TOTAL_RESULTS, totalResults);
-        mergedResponse.put(DATA, mergedData);
+        mergedResponse.put(ResidentConstants.PARTNERS, toV1Partners(mergedData));
         mergedResponseWrapper.setResponse(mergedResponse);
 
         logger.debug("GetPartnersByPartnerType::getPartnersByPartnerType()::exit");
         return mergedResponseWrapper;
+    }
+
+    /**
+     * Maps partner manager v2 records ({@code data} array) to the response consumed by
+     * the UI and internal services. All v2 fields are retained except the three that
+     * have v1 aliases ({@code partnerId}, {@code orgName}, {@code emailAddress}), which
+     * are replaced by their v1 names ({@code partnerID}, {@code organizationName},
+     * {@code emailId}) to avoid duplicate keys. Fields not present in the v2 response
+     * ({@code contactNumber}, {@code address}) are emitted as {@code null}.
+     */
+    @SuppressWarnings("unchecked")
+    private List<Map<String, Object>> toV1Partners(List<Object> v2Partners) {
+        List<Map<String, Object>> partners = new ArrayList<>();
+        for (Object partner : v2Partners) {
+            Map<String, Object> v2 = (Map<String, Object>) partner;
+            // Keep all v2 fields, then drop the ones that have v1 aliases.
+            Map<String, Object> v1 = new LinkedHashMap<>(v2);
+            v1.remove(ResidentConstants.PMS_PARTNER_ID_V2);
+            v1.remove(ResidentConstants.PARTNER_ORG_NAME_V2);
+            v1.remove(ResidentConstants.PARTNER_EMAIL_ADDRESS_V2);
+            // Add the v1-named fields.
+            v1.put(ResidentConstants.PMS_PARTNER_ID, v2.get(ResidentConstants.PMS_PARTNER_ID_V2));
+            v1.put(ResidentConstants.ORGANIZATION_NAME, v2.get(ResidentConstants.PARTNER_ORG_NAME_V2));
+            v1.put(ResidentConstants.PARTNER_EMAIL_ID, v2.get(ResidentConstants.PARTNER_EMAIL_ADDRESS_V2));
+            v1.put(ResidentConstants.PARTNER_CONTACT_NUMBER, v2.get(ResidentConstants.PARTNER_CONTACT_NUMBER));
+            v1.put(ResidentConstants.PARTNER_ADDRESS, v2.get(ResidentConstants.PARTNER_ADDRESS));
+            partners.add(v1);
+        }
+        return partners;
     }
 }

@@ -65,9 +65,9 @@ public class PartnerServiceImplTest {
 		Map<String, Object> partners = new HashMap<>();
 		ArrayList<Object> partnerList = new ArrayList<>();
 		Map<String, Object> individualPartner = new HashMap<>();
-		individualPartner.put("partnerId", "1");
+		individualPartner.put("partnerID", "1");
 		partnerList.add(individualPartner);
-		partners.put("data", partnerList);
+		partners.put("partners", partnerList);
 		responseWrapper.setResponse(partners);
 	}
 

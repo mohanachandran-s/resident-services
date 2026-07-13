@@ -38,11 +38,11 @@ public class PartnerServiceImpl implements PartnerService {
                 ResponseWrapper<?> responseWrapper = proxyPartnerManagementService.getPartnersByPartnerType(partnerType);
                 if (responseWrapper != null) {
                     Map<String, Object> partnerResponse = new LinkedHashMap<>((Map<String, Object>) responseWrapper.getResponse());
-                    List<Object> partners = (List<Object>) partnerResponse.get(ResidentConstants.PARTNERS_DATA);
+                    List<Object> partners = (List<Object>) partnerResponse.get(ResidentConstants.PARTNERS);
                     if (partners != null) {
                         for (Object partner : partners) {
                             Map<String, Object> individualPartner = new LinkedHashMap<>((Map<String, Object>) partner);
-                            partnerIds.add(individualPartner.get(ResidentConstants.PMS_PARTNER_ID_V2).toString());
+                            partnerIds.add(individualPartner.get(ResidentConstants.PMS_PARTNER_ID).toString());
                         }
                     }
                 }
