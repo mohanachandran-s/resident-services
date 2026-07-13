@@ -42,7 +42,10 @@ public class PartnerServiceImpl implements PartnerService {
                     if (partners != null) {
                         for (Object partner : partners) {
                             Map<String, Object> individualPartner = new LinkedHashMap<>((Map<String, Object>) partner);
-                            partnerIds.add(individualPartner.get(ResidentConstants.PMS_PARTNER_ID).toString());
+                            Object partnerId = individualPartner.get(ResidentConstants.PMS_PARTNER_ID);
+                            if (partnerId != null) {
+                                partnerIds.add(partnerId.toString());
+                            }
                         }
                     }
                 }
