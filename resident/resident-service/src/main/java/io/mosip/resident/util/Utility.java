@@ -801,7 +801,7 @@ public class Utility {
 	}
 
 	@CacheEvict(value = "partnerByIssuerCache", allEntries = true)
-	@Scheduled(fixedRateString = "${resident.cache.expiry.time.millisec.partnerCache}")
+	@Scheduled(fixedRateString = "${resident.cache.expiry.time.millisec.partnerByIssuerCache}")
 	public void emptyPartnerByIssuerCache() {
 		logger.info("Emptying Partner by issuer cache");
 	}
