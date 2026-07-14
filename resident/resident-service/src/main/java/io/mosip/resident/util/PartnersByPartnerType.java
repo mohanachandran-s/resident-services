@@ -33,13 +33,13 @@ public class PartnersByPartnerType {
     private static final String TOTAL_RESULTS = "totalResults";
 
     /** Fallback page size used when the configured value is invalid (zero or negative). */
-    private static final int DEFAULT_PAGE_SIZE = 100;
+    private static final int DEFAULT_PAGE_SIZE = 10;
 
     /**
      * Number of records fetched per page from the partner manager v2 API.
-     * Configurable via property; defaults to 100.
+     * Configurable via property; defaults to 10.
      */
-    @Value("${resident.partner.list.page.size:100}")
+    @Value("${resident.partner.list.page.size:10}")
     private int pageSize;
 
     @Autowired
