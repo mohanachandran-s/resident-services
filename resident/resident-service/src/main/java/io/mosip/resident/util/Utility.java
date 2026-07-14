@@ -800,6 +800,12 @@ public class Utility {
 		logger.info("Emptying Partner detail cache");
 	}
 
+	@CacheEvict(value = "partnerByIssuerCache", allEntries = true)
+	@Scheduled(fixedRateString = "${resident.cache.expiry.time.millisec.partnerCache}")
+	public void emptyPartnerByIssuerCache() {
+		logger.info("Emptying Partner by issuer cache");
+	}
+
 	@CacheEvict(value = "getValidDocumentByLangCode", allEntries = true)
 	@Scheduled(fixedRateString = "${resident.cache.expiry.time.millisec.getValidDocumentByLangCode}")
 	public void emptyGetValidDocumentByLangCodeCache() {

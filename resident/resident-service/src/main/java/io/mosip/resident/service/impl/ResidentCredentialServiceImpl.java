@@ -110,6 +110,9 @@ public class ResidentCredentialServiceImpl implements ResidentCredentialService 
 	private Utility utility;
 
 	@Autowired
+	private PartnerByIssuerCache partnerByIssuerCache;
+
+	@Autowired
 	private IdentityServiceImpl identityServiceImpl;
 
 	@Autowired
@@ -172,15 +175,13 @@ public class ResidentCredentialServiceImpl implements ResidentCredentialService 
 		PartnerResponseDto partnerResponseDto = new PartnerResponseDto();
 		CredentialReqestDto credentialReqestDto = new CredentialReqestDto();
 		Map<String, Object> additionalAttributes = new HashMap<>();
-		String partnerUrl = env.getProperty(ApiName.PARTNER_API_URL_V2.name()) + "/" + dto.getIssuer();
-		URI partnerUri = URI.create(partnerUrl);
 		try {
 				credentialReqestDto = prepareCredentialRequest(dto, individualId);
 				requestDto.setId("mosip.credential.request.service.id");
 				requestDto.setRequest(credentialReqestDto);
 				requestDto.setRequesttime(DateUtils2.formatToISOString(DateUtils2.getUTCCurrentDateTime()));
 				requestDto.setVersion("1.0");
-				parResponseDto = residentServiceRestClient.getApi(partnerUri, ResponseWrapper.class);
+				parResponseDto = partnerByIssuerCache.getPartnerByIssuer(dto.getIssuer());
 				partnerResponseDto = JsonUtil.readValue(JsonUtil.writeValueAsString(parResponseDto.getResponse()),
 						PartnerResponseDto.class);
 				additionalAttributes.put("partnerName", partnerResponseDto.getOrganizationName());
