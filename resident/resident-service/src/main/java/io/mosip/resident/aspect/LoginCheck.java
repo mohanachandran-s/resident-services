@@ -107,7 +107,7 @@ public class LoginCheck {
 		if(idaToken!=null && !idaToken.isEmpty() && sessionId != null && !sessionId.isEmpty()) {
 			audit.setAuditRequestDto(AuditEnum.LOGIN_REQ_SUCCESS);
 			ResidentSessionEntity newSessionData = new ResidentSessionEntity(sessionId, idaToken, DateUtils2.getUTCCurrentDateTime(),
-					utility.getClientIp(req), req.getRemoteHost(), getMachineType(req));
+					getMachineType(req));
 			residentSessionRepository.save(newSessionData);
 		} else {
 			audit.setAuditRequestDto(AuditEnum.LOGIN_REQ_FAILURE);

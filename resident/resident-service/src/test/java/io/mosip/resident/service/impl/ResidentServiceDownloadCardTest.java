@@ -174,9 +174,7 @@ public class ResidentServiceDownloadCardTest {
     public void testGetUserInfo() throws ApisResourceAccessException, ResidentServiceCheckedException{
         Mockito.when(identityServiceImpl.getClaimFromIdToken(Mockito.anyString())).thenReturn("claim");
         ResidentSessionEntity residentUserEntity = new ResidentSessionEntity();
-        residentUserEntity.setHost("localhost");
         residentUserEntity.setIdaToken("123");
-        residentUserEntity.setIpAddress("http");
         residentUserEntity.setSessionId("123");;
         Optional<ResidentSessionEntity> response = Optional.of(residentUserEntity);
         Mockito.when(residentSessionRepository.findFirst2ByIdaTokenOrderByLoginDtimesDesc(Mockito.anyString())).thenReturn(List.of(residentUserEntity));
@@ -296,9 +294,7 @@ public class ResidentServiceDownloadCardTest {
     @Test
     public void testGetnotificationCount() throws ApisResourceAccessException, ResidentServiceCheckedException{
     	ResidentSessionEntity residentUserEntity = new ResidentSessionEntity();
-        residentUserEntity.setHost("localhost");
         residentUserEntity.setIdaToken("123");
-        residentUserEntity.setIpAddress("http");
         residentUserEntity.setLoginDtimes(LocalDateTime.of(2015, 12, 3, 4, 4, 4));
         Optional<ResidentSessionEntity> response = Optional.of(residentUserEntity);
         ResponseWrapper<UnreadNotificationDto> responseWrapper = new ResponseWrapper<>();
@@ -317,9 +313,7 @@ public class ResidentServiceDownloadCardTest {
         unreadServiceNotificationDto.setUnreadCount(4L);
         responseWrapper.setResponse(unreadServiceNotificationDto);
         ResidentSessionEntity residentUserEntity = new ResidentSessionEntity();
-        residentUserEntity.setHost("localhost");
         residentUserEntity.setIdaToken("123");
-        residentUserEntity.setIpAddress("http");
         Optional<ResidentSessionEntity> response = Optional.of(residentUserEntity);
         ResidentUserEntity residentUserEntity1 = new ResidentUserEntity();
         residentUserEntity1.setLastbellnotifDtimes(LocalDateTime.now());

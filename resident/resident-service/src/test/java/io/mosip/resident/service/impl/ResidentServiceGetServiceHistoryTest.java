@@ -184,7 +184,6 @@ public class ResidentServiceGetServiceHistoryTest {
         Mockito.when(availableClaimValueUtility.getAvailableClaimValue(Mockito.anyString())).thenReturn("Kamesh");
         Mockito.when(environment.getProperty(Mockito.anyString())).thenReturn("property");
         residentSessionEntity = new ResidentSessionEntity();
-        residentSessionEntity.setHost("localhost");
         Mockito.when(residentSessionRepository.findFirst2ByIdaTokenOrderByLoginDtimesDesc(
                 Mockito.anyString())).thenReturn(List.of(residentSessionEntity));
         Mockito.when(availableClaimUtility.getResidentIdaToken()).thenReturn("1234");

@@ -124,7 +124,7 @@ paths:
         Full name
         Photo
         Last Login date time
-        Machine Details such as : ip_address_or_host , machine_type : Linux/Windows/Mobile
+        Machine Details such as : machine_type : Linux/Windows/Mobile
       parameters:
         - schema:
             type: string

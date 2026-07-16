@@ -33,23 +33,15 @@ public class ResidentSessionEntity {
 
 	@Column(name = "login_dtimes")
 	private LocalDateTime loginDtimes;
-	
-	@Column(name = "ip_address")
-	private String ipAddress;
-	
-	@Column(name = "host")
-	private String host;
-	
+
 	@Column(name = "machine_type")
 	private String machineType;
 
 	public ResidentSessionEntity(String sessionId, String idaToken, LocalDateTime loginDtimes,
-			String ipAddress, String host, String machineType) {
+			String machineType) {
 		this.sessionId = sessionId;
 		this.idaToken = idaToken;
 		this.loginDtimes = loginDtimes;
-		this.ipAddress = ipAddress;
-		this.host = host;
 		this.machineType = machineType;
 	}
 }
