@@ -125,28 +125,35 @@ public class PartnersByPartnerType {
 
     /**
      * Maps partner manager v2 records ({@code data} array) to the response consumed by
-     * the UI and internal services. All v2 fields are retained except the three that
-     * have v1 aliases ({@code partnerId}, {@code orgName}, {@code emailAddress}), which
-     * are replaced by their v1 names ({@code partnerID}, {@code organizationName},
-     * {@code emailId}) to avoid duplicate keys. Fields not present in the v2 response
-     * ({@code contactNumber}, {@code address}) are emitted as {@code null}.
+     * the UI and internal services. Every v2 field is kept as-is; only the three v1
+     * aliases ({@code partnerID}, {@code organizationName}, {@code emailId}) are added
+     * on top. The extra v2 keys are harmless to consumers, which read fields by name.
+     * {@code contactNumber} and {@code address} are not provided by v2, so they are
+     * added as {@code null} only when absent.
      */
     @SuppressWarnings("unchecked")
     private List<Map<String, Object>> toV1Partners(List<Object> v2Partners) {
         List<Map<String, Object>> partners = new ArrayList<>();
         for (Object partner : v2Partners) {
             Map<String, Object> v2 = (Map<String, Object>) partner;
-            // Keep all v2 fields, then drop the ones that have v1 aliases.
             Map<String, Object> v1 = new LinkedHashMap<>(v2);
-            v1.remove(ResidentConstants.PMS_PARTNER_ID_V2);
-            v1.remove(ResidentConstants.PARTNER_ORG_NAME_V2);
-            v1.remove(ResidentConstants.PARTNER_EMAIL_ADDRESS_V2);
-            // Add the v1-named fields.
+
+            /*
+             * Backward compatibility: the v2 partner manager API renamed these three
+             * fields (partnerId, orgName, emailAddress). Existing consumers - the
+             * resident UI dropdowns and the OrderCard/Credential services - still read
+             * the original v1 names, so we expose them as aliases alongside the v2
+             * fields. The v2 keys are intentionally left in place; extra keys are
+             * ignored by consumers, which read fields by name.
+             */
             v1.put(ResidentConstants.PMS_PARTNER_ID, v2.get(ResidentConstants.PMS_PARTNER_ID_V2));
             v1.put(ResidentConstants.ORGANIZATION_NAME, v2.get(ResidentConstants.PARTNER_ORG_NAME_V2));
             v1.put(ResidentConstants.PARTNER_EMAIL_ID, v2.get(ResidentConstants.PARTNER_EMAIL_ADDRESS_V2));
-            v1.put(ResidentConstants.PARTNER_CONTACT_NUMBER, v2.get(ResidentConstants.PARTNER_CONTACT_NUMBER));
-            v1.put(ResidentConstants.PARTNER_ADDRESS, v2.get(ResidentConstants.PARTNER_ADDRESS));
+
+            // Present in the v1 contract but not returned by v2; putIfAbsent so a
+            // future v2 value is never overwritten with null.
+            v1.putIfAbsent(ResidentConstants.PARTNER_CONTACT_NUMBER, null);
+            v1.putIfAbsent(ResidentConstants.PARTNER_ADDRESS, null);
             partners.add(v1);
         }
         return partners;
