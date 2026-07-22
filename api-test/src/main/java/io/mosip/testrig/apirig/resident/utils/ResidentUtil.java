@@ -170,6 +170,7 @@ public class ResidentUtil extends AdminTestUtil {
 			payloadBody.put("aud", esignetBaseURI);
 			payloadBody.put("exp", epochValue + idTokenExpirySecs);
 			payloadBody.put("iat", epochValue);
+			payloadBody.put("jti", java.util.UUID.randomUUID().toString());
 
 			jsonString = replaceKeywordValue(jsonString, "$IDPCLIENTPAYLOAD$",
 					encodeBase64(payloadBody.toString()));
