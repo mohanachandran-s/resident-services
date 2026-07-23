@@ -1,6 +1,7 @@
 package io.mosip.resident.util;
 
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -142,17 +143,16 @@ public class PartnersByPartnerTypeTest {
 	}
 
 	@Test
-	public void should_setContactNumberAndAddressNull_when_notReturnedByV2() throws Exception {
+	public void should_notAddContactNumberAndAddress_when_notReturnedByV2() throws Exception {
 		stubGetApi(page(1, List.of(v2Partner("p1"))));
 
 		Map<String, Object> partner = partnersOf(
 				partnersByPartnerType.getPartnersByPartnerType(Optional.of("Auth_Partner"), ApiName.PARTNER_API_URL))
 						.get(0);
 
-		assertTrue(partner.containsKey("contactNumber"));
-		assertTrue(partner.containsKey("address"));
-		assertNull(partner.get("contactNumber"));
-		assertNull(partner.get("address"));
+		// v2 does not provide these and the mapper no longer synthesizes them
+		assertFalse(partner.containsKey("contactNumber"));
+		assertFalse(partner.containsKey("address"));
 	}
 
 	@Test
@@ -166,7 +166,7 @@ public class PartnersByPartnerTypeTest {
 				partnersByPartnerType.getPartnersByPartnerType(Optional.of("Auth_Partner"), ApiName.PARTNER_API_URL))
 						.get(0);
 
-		// putIfAbsent must not clobber values a future v2 response provides
+		// any field v2 sends is preserved by the map copy
 		assertEquals("821-748-9064", partner.get("contactNumber"));
 		assertEquals("Albert Flats", partner.get("address"));
 	}

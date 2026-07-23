@@ -304,9 +304,7 @@ public class ResidentConstants {
 	public static final String PARTNER_EMAIL_ADDRESS_V2 = "emailAddress";
 	// UI-facing (v1) partner field names
 	public static final String ORGANIZATION_NAME = "organizationName";
-	public static final String PARTNER_CONTACT_NUMBER = "contactNumber";
 	public static final String PARTNER_EMAIL_ID = "emailId";
-	public static final String PARTNER_ADDRESS = "address";
 	public static final String AUTH_PARTNER = "Auth_Partner";
 	public static final String PRINT_PARTNER = "Print_Partner";
 	public static final String RESIDENT_SHARE_CREDENTIAL_PARTNER_TYPE = "resident.share-credential.partner.type";

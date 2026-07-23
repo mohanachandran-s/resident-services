@@ -128,8 +128,6 @@ public class PartnersByPartnerType {
      * the UI and internal services. Every v2 field is kept as-is; only the three v1
      * aliases ({@code partnerID}, {@code organizationName}, {@code emailId}) are added
      * on top. The extra v2 keys are harmless to consumers, which read fields by name.
-     * {@code contactNumber} and {@code address} are not provided by v2, so they are
-     * added as {@code null} only when absent.
      */
     @SuppressWarnings("unchecked")
     private List<Map<String, Object>> toV1Partners(List<Object> v2Partners) {
@@ -149,11 +147,6 @@ public class PartnersByPartnerType {
             v1.put(ResidentConstants.PMS_PARTNER_ID, v2.get(ResidentConstants.PMS_PARTNER_ID_V2));
             v1.put(ResidentConstants.ORGANIZATION_NAME, v2.get(ResidentConstants.PARTNER_ORG_NAME_V2));
             v1.put(ResidentConstants.PARTNER_EMAIL_ID, v2.get(ResidentConstants.PARTNER_EMAIL_ADDRESS_V2));
-
-            // Present in the v1 contract but not returned by v2; putIfAbsent so a
-            // future v2 value is never overwritten with null.
-            v1.putIfAbsent(ResidentConstants.PARTNER_CONTACT_NUMBER, null);
-            v1.putIfAbsent(ResidentConstants.PARTNER_ADDRESS, null);
             partners.add(v1);
         }
         return partners;
