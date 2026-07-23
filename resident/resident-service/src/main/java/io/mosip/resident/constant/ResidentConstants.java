@@ -299,7 +299,6 @@ public class ResidentConstants {
 	public static final String PMS_PARTNER_ID = "partnerID";
     public static final String PARTNER_TYPE = "partnerType";
 	// Partner manager v2 (admin-partners/v2) source response keys
-	public static final String PARTNERS_DATA = "data";
 	public static final String PMS_PARTNER_ID_V2 = "partnerId";
 	public static final String PARTNER_ORG_NAME_V2 = "orgName";
 	public static final String PARTNER_EMAIL_ADDRESS_V2 = "emailAddress";
