@@ -28,8 +28,17 @@ public class PartnerByIssuerCache {
     @Autowired
     private Environment env;
 
+    /*
+     * unless: never cache a failed or empty partner lookup. Spring already skips
+     * caching when the method throws, but a 200 response carrying errors or a null
+     * body must not be cached either - otherwise a transient partner-manager outage
+     * would be replayed for every subsequent reqCredential call (and a null
+     * getResponse() would NPE downstream) until the scheduled eviction runs.
+     */
     @SuppressWarnings("unchecked")
-    @Cacheable(value = "partnerByIssuerCache", key = "#issuer")
+    @Cacheable(value = "partnerByIssuerCache", key = "#issuer",
+            unless = "#result == null || #result.getResponse() == null "
+                    + "|| (#result.getErrors() != null && !#result.getErrors().isEmpty())")
     public ResponseWrapper<PartnerResponseDto> getPartnerByIssuer(String issuer) throws ApisResourceAccessException {
         String partnerUrl = env.getProperty(ApiName.PARTNER_API_URL.name()) + "/" + issuer;
         URI partnerUri = URI.create(partnerUrl);
