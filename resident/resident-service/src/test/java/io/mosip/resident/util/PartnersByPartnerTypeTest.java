@@ -106,7 +106,7 @@ public class PartnersByPartnerTypeTest {
 	// ---------- v2 -> v1 mapping ----------
 
 	@Test
-	public void testV2FieldsMappedToV1Aliases() throws Exception {
+	public void should_mapV2FieldsToV1Aliases_when_partnerReturned() throws Exception {
 		stubGetApi(page(1, List.of(v2Partner("mpartner-default-auth"))));
 
 		List<Map<String, Object>> partners = partnersOf(
@@ -121,7 +121,7 @@ public class PartnersByPartnerTypeTest {
 	}
 
 	@Test
-	public void testV2FieldsRetainedAlongsideV1Aliases() throws Exception {
+	public void should_retainV2FieldsAlongsideV1Aliases_when_partnerReturned() throws Exception {
 		stubGetApi(page(1, List.of(v2Partner("p1"))));
 
 		Map<String, Object> partner = partnersOf(
@@ -142,7 +142,7 @@ public class PartnersByPartnerTypeTest {
 	}
 
 	@Test
-	public void testContactNumberAndAddressNullWhenNotReturnedByV2() throws Exception {
+	public void should_setContactNumberAndAddressNull_when_notReturnedByV2() throws Exception {
 		stubGetApi(page(1, List.of(v2Partner("p1"))));
 
 		Map<String, Object> partner = partnersOf(
@@ -156,7 +156,7 @@ public class PartnersByPartnerTypeTest {
 	}
 
 	@Test
-	public void testContactNumberAndAddressNotOverwrittenWhenPresentInV2() throws Exception {
+	public void should_keepContactNumberAndAddress_when_presentInV2() throws Exception {
 		Map<String, Object> v2 = v2Partner("p1");
 		v2.put("contactNumber", "821-748-9064");
 		v2.put("address", "Albert Flats");
@@ -172,7 +172,7 @@ public class PartnersByPartnerTypeTest {
 	}
 
 	@Test
-	public void testNullPartnerIdMapsToNullAlias() throws Exception {
+	public void should_mapPartnerIdToNullAlias_when_partnerIdNull() throws Exception {
 		Map<String, Object> v2 = v2Partner(null);
 		stubGetApi(page(1, List.of(v2)));
 
@@ -186,7 +186,7 @@ public class PartnersByPartnerTypeTest {
 	// ---------- pagination ----------
 
 	@Test
-	public void testAllPagesAreFetchedAndMerged() throws Exception {
+	public void should_fetchAndMergeAllPages_when_multiplePages() throws Exception {
 		ReflectionTestUtils.setField(partnersByPartnerType, "pageSize", 2);
 		stubGetApi(page(5, List.of(v2Partner("p1"), v2Partner("p2"))),
 				page(5, List.of(v2Partner("p3"), v2Partner("p4"))),
@@ -203,7 +203,7 @@ public class PartnersByPartnerTypeTest {
 	}
 
 	@Test
-	public void testSinglePageWhenTotalResultsFitInOnePage() throws Exception {
+	public void should_fetchSinglePage_when_resultsFitInOnePage() throws Exception {
 		stubGetApi(page(2, List.of(v2Partner("p1"), v2Partner("p2"))));
 
 		List<Map<String, Object>> partners = partnersOf(
@@ -215,7 +215,7 @@ public class PartnersByPartnerTypeTest {
 	}
 
 	@Test
-	public void testStopsWhenPageReturnsEmptyDataBeforeTotalResultsReached() throws Exception {
+	public void should_stopFetching_when_pageReturnsEmptyData() throws Exception {
 		ReflectionTestUtils.setField(partnersByPartnerType, "pageSize", 2);
 		// totalResults claims 10 but the second page is empty - must not loop forever
 		stubGetApi(page(10, List.of(v2Partner("p1"), v2Partner("p2"))), page(10, new ArrayList<>()));
@@ -229,7 +229,7 @@ public class PartnersByPartnerTypeTest {
 	}
 
 	@Test
-	public void testPageNoIncrementsAcrossPages() throws Exception {
+	public void should_incrementPageNo_when_fetchingMultiplePages() throws Exception {
 		ReflectionTestUtils.setField(partnersByPartnerType, "pageSize", 2);
 		stubGetApi(page(3, List.of(v2Partner("p1"), v2Partner("p2"))), page(3, List.of(v2Partner("p3"))));
 
@@ -246,7 +246,7 @@ public class PartnersByPartnerTypeTest {
 	// ---------- query params ----------
 
 	@Test
-	public void testPartnerTypeQueryParamSentWhenPresent() throws Exception {
+	public void should_sendPartnerTypeQueryParam_when_partnerTypePresent() throws Exception {
 		stubGetApi(page(1, List.of(v2Partner("p1"))));
 
 		partnersByPartnerType.getPartnersByPartnerType(Optional.of("Auth_Partner"), ApiName.PARTNER_API_URL);
@@ -258,7 +258,7 @@ public class PartnersByPartnerTypeTest {
 	}
 
 	@Test
-	public void testPartnerTypeQueryParamOmittedWhenEmpty() throws Exception {
+	public void should_omitPartnerTypeQueryParam_when_partnerTypeEmpty() throws Exception {
 		stubGetApi(page(1, List.of(v2Partner("p1"))));
 
 		partnersByPartnerType.getPartnersByPartnerType(Optional.empty(), ApiName.PARTNER_API_URL);
@@ -269,7 +269,7 @@ public class PartnersByPartnerTypeTest {
 	}
 
 	@Test
-	public void testInvalidPageSizeFallsBackToDefault() throws Exception {
+	public void should_fallBackToDefaultPageSize_when_pageSizeZero() throws Exception {
 		ReflectionTestUtils.setField(partnersByPartnerType, "pageSize", 0);
 		stubGetApi(page(1, List.of(v2Partner("p1"))));
 
@@ -282,7 +282,7 @@ public class PartnersByPartnerTypeTest {
 	}
 
 	@Test
-	public void testNegativePageSizeFallsBackToDefault() throws Exception {
+	public void should_fallBackToDefaultPageSize_when_pageSizeNegative() throws Exception {
 		ReflectionTestUtils.setField(partnersByPartnerType, "pageSize", -5);
 		stubGetApi(page(1, List.of(v2Partner("p1"))));
 
@@ -296,7 +296,7 @@ public class PartnersByPartnerTypeTest {
 	// ---------- empty / error paths ----------
 
 	@Test
-	public void testNullResponseReturnsEmptyPartnerList() throws Exception {
+	public void should_returnEmptyPartnerList_when_responseNull() throws Exception {
 		ResponseWrapper<Object> wrapper = new ResponseWrapper<>();
 		wrapper.setErrors(new ArrayList<>());
 		wrapper.setResponse(null);
@@ -309,7 +309,7 @@ public class PartnersByPartnerTypeTest {
 	}
 
 	@Test
-	public void testEmptyDataReturnsEmptyPartnerList() throws Exception {
+	public void should_returnEmptyPartnerList_when_dataEmpty() throws Exception {
 		stubGetApi(page(0, new ArrayList<>()));
 
 		List<Map<String, Object>> partners = partnersOf(
@@ -319,7 +319,7 @@ public class PartnersByPartnerTypeTest {
 	}
 
 	@Test
-	public void testMissingDataKeyReturnsEmptyPartnerList() throws Exception {
+	public void should_returnEmptyPartnerList_when_dataKeyMissing() throws Exception {
 		Map<String, Object> response = new LinkedHashMap<>();
 		response.put("totalResults", 5);
 		ResponseWrapper<Object> wrapper = new ResponseWrapper<>();
@@ -334,7 +334,7 @@ public class PartnersByPartnerTypeTest {
 	}
 
 	@Test(expected = ResidentServiceCheckedException.class)
-	public void testErrorsInResponseThrowResidentServiceCheckedException() throws Exception {
+	public void should_throwResidentServiceCheckedException_when_responseHasErrors() throws Exception {
 		ResponseWrapper<Object> wrapper = new ResponseWrapper<>();
 		wrapper.setErrors(List.of(new ServiceError("RES-SER-441", "Exception while calling partner service")));
 		stubGetApi(wrapper);
@@ -343,7 +343,7 @@ public class PartnersByPartnerTypeTest {
 	}
 
 	@Test(expected = ResidentServiceCheckedException.class)
-	public void testApisResourceAccessExceptionIsWrapped() throws Exception {
+	public void should_wrapApisResourceAccessException_when_restClientFails() throws Exception {
 		when(residentServiceRestClient.getApi((ApiName) any(), (List<String>) any(), (List<String>) any(),
 				(List<Object>) any(), (Class<Object>) any())).thenThrow(new ApisResourceAccessException());
 
@@ -351,7 +351,7 @@ public class PartnersByPartnerTypeTest {
 	}
 
 	@Test
-	public void testResponseIsWrappedUnderPartnersKey() throws Exception {
+	public void should_wrapResponseUnderPartnersKey_when_partnersReturned() throws Exception {
 		stubGetApi(page(1, List.of(v2Partner("p1"))));
 
 		ResponseWrapper<?> result = partnersByPartnerType.getPartnersByPartnerType(Optional.of("Auth_Partner"),
