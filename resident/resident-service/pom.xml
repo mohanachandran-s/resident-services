@@ -16,11 +16,11 @@
         <commons.packet.manager.version>1.3.1-rc.1</commons.packet.manager.version>
         <kernel.core.version>1.3.1-rc.1</kernel.core.version>
         <kernel.virusscanner.clamav.version>1.3.1-rc.1</kernel.virusscanner.clamav.version>
-        <kernel.authcodeflowproxy.api.version>1.4.0-SNAPSHOT</kernel.authcodeflowproxy.api.version>
+        <kernel.authcodeflowproxy.api.version>1.3.1</kernel.authcodeflowproxy.api.version>
         <kernel.parent.version>1.3.1-rc.1</kernel.parent.version>
         <kernel-cbeffutil-api.version>1.3.1</kernel-cbeffutil-api.version>
         <kernel.khazana.version>1.3.2-rc.1</kernel.khazana.version>
-        <kernel-openid-bridge-api.version>1.4.0-SNAPSHOT</kernel-openid-bridge-api.version>
+        <kernel-openid-bridge-api.version>1.3.1</kernel-openid-bridge-api.version>
         <maven.jacoco.plugin.version>0.8.11</maven.jacoco.plugin.version>
         <pre-registration-application-service.version>1.3.0</pre-registration-application-service.version>
         <jacoco.maven.plugin.version>0.8.11</jacoco.maven.plugin.version>
@@ -28,7 +28,7 @@
         <kernel-websubclient-api.version>1.3.1-rc.1</kernel-websubclient-api.version>
         <kernel-pdfgenerator.version>1.3.1-rc.1</kernel-pdfgenerator.version>
         <kernel-ref-idobjectvalidato.version>1.3.1-rc.1</kernel-ref-idobjectvalidato.version>
-        <kernel-auth-adpater.version>1.4.0-SNAPSHOT</kernel-auth-adpater.version>
+        <kernel-auth-adpater.version>1.3.1</kernel-auth-adpater.version>
         <kernel-ref-idobjectvalidator.version>1.3.1-rc.1</kernel-ref-idobjectvalidator.version>
         <central.publishing.maven.plugin.version>0.7.0</central.publishing.maven.plugin.version>
     </properties>
