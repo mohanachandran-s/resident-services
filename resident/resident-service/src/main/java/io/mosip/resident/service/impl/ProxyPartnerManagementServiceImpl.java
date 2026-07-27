@@ -39,7 +39,7 @@ public class ProxyPartnerManagementServiceImpl implements ProxyPartnerManagement
 	}
 
 	@SuppressWarnings("unchecked")
-	@Cacheable(value = "partnerDetailCache", key = "#partnerId + '_' + #partnerType")
+	@Cacheable(value = "partnerDetailCache", key = "#partnerId")
 	@Override
 	public Map<String, ?> getPartnerDetailFromPartnerIdAndPartnerType(String partnerId, String partnerType) {
 		ResponseWrapper<?> response = null;
