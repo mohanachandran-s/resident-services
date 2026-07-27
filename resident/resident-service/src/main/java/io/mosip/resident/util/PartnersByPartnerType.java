@@ -39,7 +39,7 @@ public class PartnersByPartnerType {
      * Number of records fetched per page from the partner manager v2 API.
      * Configurable via property; defaults to 10.
      */
-    @Value("${resident.partner.list.page.size:10}")
+    @Value("${resident.partner.list.page.size:" + DEFAULT_PAGE_SIZE + "}")
     private int pageSize;
 
     @Autowired
@@ -56,13 +56,6 @@ public class PartnersByPartnerType {
         int totalResults = 0;
 
         int effectivePageSize = pageSize;
-        if (effectivePageSize <= 0) {
-            logger.warn(String.format(
-                    "Invalid resident.partner.list.page.size [%d]; falling back to default [%d]",
-                    pageSize, DEFAULT_PAGE_SIZE));
-            effectivePageSize = DEFAULT_PAGE_SIZE;
-        }
-
         try {
             do {
                 List<String> pathsegements = null;
