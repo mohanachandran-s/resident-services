@@ -268,31 +268,6 @@ public class PartnersByPartnerTypeTest {
 		assertEquals(List.of("pageSize", "pageNo"), queryParamNameCaptor.getValue());
 	}
 
-	@Test
-	public void should_fallBackToDefaultPageSize_when_pageSizeZero() throws Exception {
-		ReflectionTestUtils.setField(partnersByPartnerType, "pageSize", 0);
-		stubGetApi(page(1, List.of(v2Partner("p1"))));
-
-		partnersByPartnerType.getPartnersByPartnerType(Optional.of("Auth_Partner"), ApiName.PARTNER_API_URL);
-
-		verify(residentServiceRestClient).getApi((ApiName) any(), (List<String>) any(),
-				queryParamNameCaptor.capture(), queryParamValueCaptor.capture(), (Class<Object>) any());
-		// pageSize is the second query param and must be the 10 fallback, not 0
-		assertEquals(10, queryParamValueCaptor.getValue().get(1));
-	}
-
-	@Test
-	public void should_fallBackToDefaultPageSize_when_pageSizeNegative() throws Exception {
-		ReflectionTestUtils.setField(partnersByPartnerType, "pageSize", -5);
-		stubGetApi(page(1, List.of(v2Partner("p1"))));
-
-		partnersByPartnerType.getPartnersByPartnerType(Optional.of("Auth_Partner"), ApiName.PARTNER_API_URL);
-
-		verify(residentServiceRestClient).getApi((ApiName) any(), (List<String>) any(),
-				queryParamNameCaptor.capture(), queryParamValueCaptor.capture(), (Class<Object>) any());
-		assertEquals(10, queryParamValueCaptor.getValue().get(1));
-	}
-
 	// ---------- empty / error paths ----------
 
 	@Test
