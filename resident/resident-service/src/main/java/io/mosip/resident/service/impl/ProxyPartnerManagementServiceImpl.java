@@ -55,7 +55,7 @@ public class ProxyPartnerManagementServiceImpl implements ProxyPartnerManagement
             return Map.of();
         }
         return partners.stream()
-        		.filter(map -> partnerId.equals(map.get(ResidentConstants.PMS_PARTNER_ID)))
+				.filter(map -> ((String)map.get(ResidentConstants.PMS_PARTNER_ID)).equals(partnerId))
         		.findAny()
         		.orElse(Map.of());
 	}
