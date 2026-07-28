@@ -81,6 +81,13 @@ public class PartnersByPartnerType {
                             responseWrapper.getErrors().get(0).getMessage());
                 }
 
+                if (pageNo == 0) {
+                    mergedResponseWrapper.setId(responseWrapper.getId());
+                    mergedResponseWrapper.setVersion(responseWrapper.getVersion());
+                    mergedResponseWrapper.setResponsetime(responseWrapper.getResponsetime());
+                    mergedResponseWrapper.setMetadata(responseWrapper.getMetadata());
+                }
+
                 Map<String, Object> pageResponse = (Map<String, Object>) responseWrapper.getResponse();
                 if (pageResponse == null) {
                     break;
