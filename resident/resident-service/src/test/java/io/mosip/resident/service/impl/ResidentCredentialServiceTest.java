@@ -15,6 +15,7 @@ import java.util.Map;
 
 import io.mosip.resident.util.AvailableClaimUtility;
 import io.mosip.resident.util.MaskDataUtility;
+import io.mosip.resident.util.PartnerByIssuerCache;
 import org.json.JSONObject;
 import org.junit.Before;
 import org.junit.Test;
@@ -111,6 +112,9 @@ public class ResidentCredentialServiceTest {
 	@Mock
 	private AvailableClaimUtility availableClaimUtility;
 
+	@Mock
+	private PartnerByIssuerCache partnerByIssuerCache;
+
 	private ResidentCredentialRequestDto residentCredentialRequestDto;
 
 	private ResidentTransactionEntity residentTransactionEntity;
@@ -167,10 +171,7 @@ public class ResidentCredentialServiceTest {
 		requestDto.setRequesttime(DateUtils2.getUTCCurrentDateTimeString());
 		requestDto.setVersion("1.0");
 
-		String partnerUrl = env.getProperty(ApiName.PARTNER_API_URL.name()) + "/"
-				+ residentCredentialRequestDto.getIssuer();
-		URI partnerUri = URI.create(partnerUrl);
-		when(residentServiceRestClient.getApi(partnerUri, ResponseWrapper.class))
+		when(partnerByIssuerCache.getPartnerByIssuer(any()))
 				.thenReturn(partnerResponseDtoResponseWrapper);
 		when(residentServiceRestClient.postApi(any(), any(), any(), any())).thenReturn(response);
 
@@ -241,10 +242,7 @@ public class ResidentCredentialServiceTest {
 		requestDto.setRequesttime(DateUtils2.getUTCCurrentDateTimeString());
 		requestDto.setVersion("1.0");
 
-		String partnerUrl = env.getProperty(ApiName.PARTNER_API_URL.name()) + "/"
-				+ residentCredentialRequestDto.getIssuer();
-		URI partnerUri = URI.create(partnerUrl);
-		when(residentServiceRestClient.getApi(partnerUri, ResponseWrapper.class))
+		when(partnerByIssuerCache.getPartnerByIssuer(any()))
 				.thenReturn(partnerResponseDtoResponseWrapper);
 		when(residentServiceRestClient.postApi(any(), any(), any(), any()))
 				.thenThrow(ApisResourceAccessException.class);
@@ -276,10 +274,7 @@ public class ResidentCredentialServiceTest {
 		requestDto.setRequesttime(DateUtils2.getUTCCurrentDateTimeString());
 		requestDto.setVersion("1.0");
 
-		String partnerUrl = env.getProperty(ApiName.PARTNER_API_URL.name()) + "/"
-				+ residentCredentialRequestDto.getIssuer();
-		URI partnerUri = URI.create(partnerUrl);
-		when(residentServiceRestClient.getApi(partnerUri, ResponseWrapper.class))
+		when(partnerByIssuerCache.getPartnerByIssuer(any()))
 				.thenReturn(partnerResponseDtoResponseWrapper);
 		when(residentServiceRestClient.postApi(any(), any(), any(), any()))
 				.thenReturn(partnerResponseDtoResponseWrapper);

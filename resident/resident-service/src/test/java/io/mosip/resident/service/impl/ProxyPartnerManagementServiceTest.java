@@ -131,17 +131,32 @@ public class ProxyPartnerManagementServiceTest {
 
 	@Test
 	public void testGetPartnersByPartnerTypeV2() throws ApisResourceAccessException, ResidentServiceCheckedException {
+		Map<String, Object> partner = new HashMap<>();
+		partner.put("partnerId", "2345671");
+		partner.put("orgName", "IITB");
+		partner.put("partnerType", "Auth_Partner");
+		Map<String, Object> pageResponse = new HashMap<>();
+		pageResponse.put("totalResults", 1);
+		pageResponse.put("data", List.of(partner));
+
 		ResponseWrapper<Object> responseWrapper = new ResponseWrapper<>();
 		responseWrapper.setErrors(new ArrayList<>());
 		responseWrapper.setId("https://example.org/example");
 		responseWrapper.setMetadata("Metadata");
-		responseWrapper.setResponse("Response");
+		responseWrapper.setResponse(pageResponse);
 		responseWrapper.setResponsetime(LocalDateTime.of(1, 1, 1, 1, 1));
 		responseWrapper.setVersion("https://example.org/example");
 		when(residentServiceRestClient.getApi((ApiName) any(), (List<String>) any(), (List<String>) any(),
 				(List<Object>) any(), (Class<Object>) any())).thenReturn(responseWrapper);
-		assertSame(responseWrapper,
-				partnersByPartnerType.getPartnersByPartnerType(Optional.of("42"), ApiName.PARTNER_API_URL));
+
+		ResponseWrapper<?> result = partnersByPartnerType.getPartnersByPartnerType(Optional.of("42"),
+				ApiName.PARTNER_API_URL);
+		Map<String, Object> mergedResponse = (Map<String, Object>) result.getResponse();
+		List<Map<String, Object>> partners = (List<Map<String, Object>>) mergedResponse.get("partners");
+		assertEquals(1, partners.size());
+		assertEquals("2345671", partners.get(0).get("partnerID"));
+		assertEquals("IITB", partners.get(0).get("organizationName"));
+		assertEquals("Auth_Partner", partners.get(0).get("partnerType"));
 		verify(residentServiceRestClient).getApi((ApiName) any(), (List<String>) any(), (List<String>) any(),
 				(List<Object>) any(), (Class<Object>) any());
 	}

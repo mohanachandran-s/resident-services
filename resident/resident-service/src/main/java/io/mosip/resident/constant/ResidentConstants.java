@@ -298,7 +298,13 @@ public class ResidentConstants {
     public static final String PARTNERS = "partners";
 	public static final String PMS_PARTNER_ID = "partnerID";
     public static final String PARTNER_TYPE = "partnerType";
+	// Partner manager v2 (admin-partners/v2) source response keys
+	public static final String PMS_PARTNER_ID_V2 = "partnerId";
+	public static final String PARTNER_ORG_NAME_V2 = "orgName";
+	public static final String PARTNER_EMAIL_ADDRESS_V2 = "emailAddress";
+	// UI-facing (v1) partner field names
 	public static final String ORGANIZATION_NAME = "organizationName";
+	public static final String PARTNER_EMAIL_ID = "emailId";
 	public static final String AUTH_PARTNER = "Auth_Partner";
 	public static final String PRINT_PARTNER = "Print_Partner";
 	public static final String RESIDENT_SHARE_CREDENTIAL_PARTNER_TYPE = "resident.share-credential.partner.type";

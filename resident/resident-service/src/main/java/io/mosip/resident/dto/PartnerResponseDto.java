@@ -1,19 +1,23 @@
 package io.mosip.resident.dto;
 
+import com.fasterxml.jackson.databind.JsonNode;
 import lombok.Data;
+
+import java.time.LocalDateTime;
+import java.util.Date;
 
 @Data
 public class PartnerResponseDto {
 
-	private String partnerID;
+	private String partnerId;
 
-	private String status;
+	private String approvalStatus;
 
-	private String policyGroup;
+	private String policyGroupName;
+	
+	private String policyGroupDescription;
 
 	private String organizationName;
-
-	private String address;
 
 	private String contactNumber;
 
@@ -22,5 +26,20 @@ public class PartnerResponseDto {
 	private String partnerType;
 
 	private Boolean isActive;
+	
+	private String firstName;
+	
+	private String lastName;
 
+	private LocalDateTime createdDateTime;
+
+	private Date certificateUploadDateTime;
+	
+	private Date certificateExpiryDateTime;
+
+	private Boolean isCertificateAvailable;
+
+	private String logoUrl;
+
+	private JsonNode additionalInfo;
 }
