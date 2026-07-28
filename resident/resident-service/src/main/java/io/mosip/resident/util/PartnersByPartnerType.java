@@ -81,6 +81,13 @@ public class PartnersByPartnerType {
                             responseWrapper.getErrors().get(0).getMessage());
                 }
 
+                /**
+                 * We capture the wrapper-level metadata (id, version, responsetime, metadata) 
+                 * from the very first paginated API response. Since the API returns these 
+                 * fields consistently across pages, capturing them once ensures that our 
+                 * final merged response retains the original context and structure expected 
+                 * by the upstream clients, rather than returning a partially empty wrapper.
+                 */
                 if (pageNo == 0) {
                     mergedResponseWrapper.setId(responseWrapper.getId());
                     mergedResponseWrapper.setVersion(responseWrapper.getVersion());
