@@ -13,7 +13,7 @@ import io.mosip.resident.dto.ResponseWrapper;
 import io.mosip.resident.exception.ApisResourceAccessException;
 
 /**
- * Caches the single-partner lookup ({@code PARTNER_API_URL_V2 + "/" + issuer})
+ * Caches the single-partner lookup ({@code PARTNER_BY_PARTNER_ID_API_URL + "/" + issuer})
  * so repeated credential requests for the same issuer do not hit the partner
  * manager API every time.
  *
@@ -40,7 +40,7 @@ public class PartnerByIssuerCache {
             unless = "#result == null || #result.getResponse() == null "
                     + "|| (#result.getErrors() != null && !#result.getErrors().isEmpty())")
     public ResponseWrapper<PartnerResponseDto> getPartnerByIssuer(String issuer) throws ApisResourceAccessException {
-        String partnerUrl = env.getProperty(ApiName.PARTNER_API_URL_V2.name()) + "/" + issuer;
+        String partnerUrl = env.getProperty(ApiName.PARTNER_BY_PARTNER_ID_API_URL.name()) + "/" + issuer;
         URI partnerUri = URI.create(partnerUrl);
         return (ResponseWrapper<PartnerResponseDto>) residentServiceRestClient.getApi(partnerUri, ResponseWrapper.class);
     }
