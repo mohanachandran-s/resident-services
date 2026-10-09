@@ -122,13 +122,13 @@ public class AuditValidator extends ResidentUtil implements ITest {
 
 		if (isEventValidation) {
 			long eventCount = getAuditEventCount(response);
-			objOpDto.setFieldName("audit events " + auditEventIds + " (app_id " + auditAppId + ") after " + previousCheckpoint);
+			objOpDto.setFieldName("audit events " + auditEventIds + " (app_id " + auditAppId + ") after " + previousCheckpoint + " UTC");
 			objOpDto.setExpValue("> 0");
 			objOpDto.setActualValue(String.valueOf(eventCount));
 			objOpDto.setStatus(eventCount > 0 ? "PASS" : GlobalConstants.FAIL_STRING);
 		} else {
 			objOpDto.setFieldName("audit checkpoint");
-			objOpDto.setExpValue("latest log_dtimes");
+			objOpDto.setExpValue("latest log_dtimes (UTC)");
 			objOpDto.setActualValue(String.valueOf(checkpoint));
 			objOpDto.setStatus(isCheckpointCaptured ? "PASS" : GlobalConstants.FAIL_STRING);
 		}
