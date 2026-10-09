@@ -295,5 +295,18 @@ public class ResidentUtil extends AdminTestUtil {
 		return true;
 
 	}
-	
+
+	protected static String toSqlInList(String commaSeparatedValues) {
+		List<String> values = new ArrayList<>();
+		for (String value : commaSeparatedValues.split(",")) {
+			if (!value.isBlank())
+				values.add("'" + sanitizeSqlValue(value.trim()) + "'");
+		}
+		return String.join(",", values);
+	}
+
+	// Guards against SQL injection from suite XML values
+	protected static String sanitizeSqlValue(String value) {
+		return value.replaceAll("[^A-Za-z0-9_-]", "");
+	}
 }

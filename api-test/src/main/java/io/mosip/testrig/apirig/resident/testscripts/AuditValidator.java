@@ -160,20 +160,6 @@ public class AuditValidator extends ResidentUtil implements ITest {
 		return count instanceof Number ? ((Number) count).longValue() : 0;
 	}
 
-	private static String toSqlInList(String commaSeparatedValues) {
-		List<String> values = new ArrayList<>();
-		for (String value : commaSeparatedValues.split(",")) {
-			if (!value.isBlank())
-				values.add("'" + sanitizeSqlValue(value.trim()) + "'");
-		}
-		return String.join(",", values);
-	}
-
-	// Guards against SQL injection from suite XML values
-	private static String sanitizeSqlValue(String value) {
-		return value.replaceAll("[^A-Za-z0-9_-]", "");
-	}
-
 	/*
 	 * The method set current test name to result
 	 * 
