@@ -37,8 +37,7 @@ public class AuditValidator extends ResidentUtil implements ITest {
 	public Response response = null;
 	private String auditEventIds = null;
 	private String auditAppId = "RES_SER";
-	// Audit entries are written asynchronously
-	private static final int AUDIT_EVENT_MAX_WAIT_MS = 15000;
+	private static final long DEFAULT_AUDIT_EVENT_MAX_WAIT_SECONDS = 15;
 	private static final int AUDIT_EVENT_POLL_INTERVAL_MS = 1000;
 
 	/**
@@ -96,7 +95,7 @@ public class AuditValidator extends ResidentUtil implements ITest {
 		}
 		logger.info(query);
 		Map<String, Object> response = DBManager.executeQueryAndGetRecord(testCaseDTO.getRole(), query);
-		long deadline = System.currentTimeMillis() + AUDIT_EVENT_MAX_WAIT_MS;
+		long deadline = System.currentTimeMillis() + getAuditEventMaxWaitSeconds() * 1000L;
 		while (isEventValidation && getAuditEventCount(response) == 0 && System.currentTimeMillis() < deadline) {
 			try {
 				Thread.sleep(AUDIT_EVENT_POLL_INTERVAL_MS);
@@ -140,6 +139,20 @@ public class AuditValidator extends ResidentUtil implements ITest {
 
 		if (!OutputValidationUtil.publishOutputResult(objMap))
 			throw new AdminTestException("Failed at output validation");
+	}
+
+	// Audit entries are written asynchronously, so wait for them up to this limit
+	private static long getAuditEventMaxWaitSeconds() {
+		String maxWaitStr = ResidentConfigManager.getproperty("auditEventMaxWaitSeconds");
+		if (maxWaitStr != null && !maxWaitStr.isBlank()) {
+			try {
+				return Long.parseLong(maxWaitStr.trim());
+			} catch (NumberFormatException e) {
+				logger.warn("Invalid auditEventMaxWaitSeconds property: " + maxWaitStr + ", using default: "
+						+ DEFAULT_AUDIT_EVENT_MAX_WAIT_SECONDS);
+			}
+		}
+		return DEFAULT_AUDIT_EVENT_MAX_WAIT_SECONDS;
 	}
 
 	private static long getAuditEventCount(Map<String, Object> response) {
