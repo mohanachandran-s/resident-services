@@ -37,7 +37,7 @@ import io.restassured.response.Response;
 public class ResidentUtil extends AdminTestUtil {
 
 	private static final Logger logger = Logger.getLogger(ResidentUtil.class);
-	protected static int ResidentAuditCount = 0;
+	protected static String ResidentAuditCheckpoint = null;
 	protected static final String ESIGNET_PAYLOAD = "config/esignetPayload.json";
 	
 	public static List<String> testCasesInRunScope = new ArrayList<>();
